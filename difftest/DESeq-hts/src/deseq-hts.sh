@@ -5,7 +5,7 @@
 # the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
 #
-# Copyright (C) 2009-2012 Max Planck Society
+# Copyright (C) 2009-2013 Max Planck Society & Memorial Sloan-Kettering Cancer Center 
 #
 
 set -e 
@@ -16,7 +16,7 @@ DIR=`dirname $0`
 . ${DIR}/../bin/deseq_config.sh
 
 echo
-echo ${PROG}: Oqtans http://galaxy.raetschlab.org Galaxy wrapper for the DESeq version $DESEQ_VERSION.
+echo ${PROG}: Oqtans http://galaxy.cbio.mskcc.org Galaxy wrapper for the DESeq version $DESEQ_VERSION.
 echo
 echo DESeq performs differential expression testing from RNA-Seq measurements.
 echo 
