@@ -1,3 +1,4 @@
+### load DESeq package
 suppressMessages(require("DESeq"))
 
 ### get arguments 1: INFILE, 2: OUTFILE 3:SIZE
@@ -36,21 +37,34 @@ if (length(levels(conds)) < length(conds))
 }
 experiments <- levels(conds)
 
-res<-c()
+res_1<-c()
+res_2<-c()
+res_3<-c()
+res_4<-c()
+res_5<-c()
+res_6<-c()
+res_7<-c()
+res_8<-c()
 table_col_names<-c()
+
 for (i in 1:(length(experiments)-1))
 {
    for( j in (i+1):(length(experiments)))
    {
        print(c(i,j))
-       tempres <- nbinomTest(cds,experiments[i],experiments[j],pvals_only = FALSE, eps=NULL)
-       res = cbind(res,tempres[,7])
-       #res = cbind(res,tempres[,8])
-       table_col_names = cbind(table_col_names,paste('cond_', experiments[i], '_vs._cond_', experiments[j], sep='')) 
+       tempres <- nbinomTest(cds,experiments[i],experiments[j])
+       res_1 = cbind(res_1,tempres[,1])
+       res_2 = cbind(res_2,tempres[,2])
+       res_3 = cbind(res_3,tempres[,3])
+       res_4 = cbind(res_4,tempres[,4])
+       res_5 = cbind(res_5,tempres[,5])
+       res_6 = cbind(res_6,tempres[,6])
+       res_7 = cbind(res_7,tempres[,7])
+       res_8 = cbind(res_8,tempres[,8])
+       table_col_names = cbind(table_col_names,paste('cond_', experiments[i], '_vs._cond_', experiments[j], sep='', 'test')) 
    }
 }
 
-DiffTable<-res
-rownames(DiffTable)<-rownames(countsTable)
-colnames(DiffTable)<-table_col_names
+DiffTable<-cbind(res_1,res_2,res_3,res_4,res_5,res_6,res_7,res_8)
+colnames(DiffTable)<-c('feature ID', 'base  mean', 'base mean A', 'base mean B', 'fold change', 'log2 fold change','p value', 'adjusted p value')
 write.table(DiffTable, file = OUTFILE, quote = FALSE, sep ="\t", eol ="\n", na = "1.000", dec = ".", row.names = TRUE,col.names =TRUE)
