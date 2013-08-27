@@ -1,5 +1,5 @@
-<tool id="deseq-hts" name="DESeq" version="1.10.1">
-  <description>Determines differentially expressed transcripts from read alignments</description>
+<tool id="deseq-hts" name="DESeq" version="1.12.1">
+  <description> Determines differentially expressed transcripts from read alignments</description>
   <command interpreter="bash"> 
 deseq_hts/src/deseq-hts.sh $anno_input_selected $deseq_out $deseq_out.extra_files_path/gene_map.mat 
 #for $i in $replicate_groups
@@ -51,8 +51,6 @@ Genome annotation file in GFF3, containing the necessary information about the t
 
 The BAM alignment files grouped into replicate groups, each containing several replicates. BAM files store the read alignments, The program will also work with only two groups containing only a single replicate each. However, this analysis has less statistical power and is therefore not recommended!
 
-`DESeq` generates a text file containing the gene name and the p-value.
-
 ------
 
 **Licenses**
@@ -98,7 +96,7 @@ http://samtools.sourceforge.net/.
 
 ------
 
-DESeq-hts Wrapper Version 0.4 (Feb 2013)
+DESeq-hts Wrapper Version 0.5 (Aug 2013)
 
 </help>
 </tool>
