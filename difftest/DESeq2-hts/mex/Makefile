@@ -1,4 +1,4 @@
-include ../bin/deseq_config.sh
+include ../bin/deseq2_config.sh
 
 MEX=${MATLAB_MEX_PATH}
 MKOCTFILE=${OCTAVE_MKOCT}
