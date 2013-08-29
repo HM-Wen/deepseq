@@ -1,5 +1,5 @@
 function deseq_config
-% DESEQ_CONFIG   Sets a few global variables with system dependent paths.
+% DESEQ2_CONFIG   Sets a few global variables with system dependent paths.
 %
 %
 % This program is free software; you can redistribute it and/or modify
@@ -12,7 +12,7 @@ function deseq_config
 %
 
 % paths
-global DESEQ_PATH DESEQ_SRC_PATH
+global DESEQ2_PATH DESEQ2_SRC_PATH
 
 % interpreter paths
 global INTERPRETER MATLAB_BIN_PATH OCTAVE_BIN_PATH
@@ -21,15 +21,15 @@ global INTERPRETER MATLAB_BIN_PATH OCTAVE_BIN_PATH
 global SAMTOOLS_DIR
 
 % configuration (adapt to the user's configuration)
-DESEQ_PATH = getenv('DESEQ_PATH');
-DESEQ_SRC_PATH = getenv('DESEQ_SRC_PATH');
+DESEQ2_PATH = getenv('DESEQ2_PATH');
+DESEQ2_SRC_PATH = getenv('DESEQ2_SRC_PATH');
 INTERPRETER = getenv('INTERPRETER');
 MATLAB_BIN_PATH = getenv('MATLAB_BIN_PATH');
 OCTAVE_BIN_PATH = getenv('OCTAVE_BIN_PATH');
 SAMTOOLS_DIR = getenv('SAMTOOLS_DIR');
 
 % switch off a few expected warnings
-addpath(sprintf('%s/tools', DESEQ_PATH));
+addpath(sprintf('%s/tools', DESEQ2_PATH));
 engine='';
 lserve=license;
 if ~isequal(lserve, 'GNU General Public License'),

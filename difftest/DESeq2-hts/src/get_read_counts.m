@@ -6,7 +6,7 @@ function get_read_counts(anno_dir, outfile, varargin)
 % varargin: list of BAM files (at least two)
 
 % DESeq paths
-global DESEQ_PATH DESEQ_SRC_PATH
+global DESEQ2_PATH DESEQ2_SRC_PATH
 
 % interpreter paths
 global INTERPRETER MATLAB_BIN_PATH OCTAVE_BIN_PATH
@@ -15,9 +15,9 @@ global INTERPRETER MATLAB_BIN_PATH OCTAVE_BIN_PATH
 global SAMTOOLS_DIR
 
 %%%% paths
-addpath(sprintf('%s/tools', DESEQ_PATH));
-addpath(sprintf('%s/mex', DESEQ_PATH));
-addpath(sprintf('%s', DESEQ_SRC_PATH));
+addpath(sprintf('%s/tools', DESEQ2_PATH));
+addpath(sprintf('%s/mex', DESEQ2_PATH));
+addpath(sprintf('%s', DESEQ2_SRC_PATH));
 
 deseq_config;
 
