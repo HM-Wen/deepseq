@@ -13,7 +13,7 @@ set -e
 PROG=`basename $0`
 DIR=`dirname $0`
 
-. ${DIR}/../bin/deseq_config.sh
+. ${DIR}/../bin/edger_config.sh
 
 echo
 echo ${PROG}: Oqtans http://galaxy.cbio.mskcc.org Galaxy wrapper for the edgeR version $edgeR_VERSION.
@@ -77,8 +77,8 @@ echo %%%%%%%%%%%%%%%%%%%%%%%%%%%
 echo
 echo testing genes for differential expression using given alignments
 
-echo "cat ${DIR}/../src/difftest_deseq.R | $R_PATH --slave --args $tmpfile ${DESEQ_RES_FILE} $#"
-cat ${DIR}/../src/difftest_deseq.R | $R_PATH --slave --args $tmpfile ${DESEQ_RES_FILE} $# 
+echo "cat ${DIR}/../src/edger_difftest.R | $R_PATH --slave --args $tmpfile ${DESEQ_RES_FILE} $#"
+cat ${DIR}/../src/edger_difftest.R | $R_PATH --slave --args $tmpfile ${DESEQ_RES_FILE} $# 
 
 #rm $tmpfile ${tmpfile}_COUNTS.tab ${tmpfile}_CONDITIONS.tab
 echo %%%%%%%%
