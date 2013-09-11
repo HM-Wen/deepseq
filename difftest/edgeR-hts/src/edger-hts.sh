@@ -1,12 +1,12 @@
 #/bin/bash
-#
+##
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
 #
 # Copyright (C) 2009-2013 Max Planck Society & Memorial Sloan-Kettering Cancer Center 
-#
+##
 
 set -e 
 
@@ -18,38 +18,38 @@ DIR=`dirname $0`
 echo
 echo ${PROG}: Oqtans http://galaxy.cbio.mskcc.org Galaxy wrapper for the edgeR version $edgeR_VERSION.
 echo
-echo edgeR performs differential expression testing from RNA-Seq measurements.
+echo edgeR provides statistical routines for assessing differential expression in RNA-Seq experiments.
 echo 
 
-ANNO_INPUT=${1}
+ANNO_GFF=${1}
 shift
-DESEQ_RES_FILE=${1}
+RES_FILE=${1}
 shift
 GENES_FN=${1}
 shift
 
 mkdir -p `dirname $GENES_FN`
+touch ${GENES_FN}
 
 echo %%%%%%%%%%%%%%%%%%%%%%%
 echo % 1. Data preparation %
 echo %%%%%%%%%%%%%%%%%%%%%%%
 echo
-echo load the genome annotation in GFF3 format and create an annotation object
-export PYTHONPATH=$PYTHONPATH:${SCIPY_PATH}
-${PYTHON_PATH} ${DIR}/../tools/ParseGFF.py ${ANNO_INPUT} ${GENES_FN}
-${DIR}/../bin/genes_cell2struct ${GENES_FN} 
+echo load the genome annotation and creating annotation object...
+${PYTHON_PATH} ${DIR}/../tools/GFFParser.py ${ANNO_GFF} ${GENES_FN}
+echo genome annotation object stored in $GENES_FN
 echo 
-echo genome annotation stored in $GENES_FN
+
+ANL_TYPE=${1}
+shift
+FDR_MT=${1}
+shift
 
 echo %%%%%%%%%%%%%%%%%%%%
 echo % 2. Read counting %
 echo %%%%%%%%%%%%%%%%%%%%
 echo
-
-## TODO getting other input arguments
-
-## 
-echo counting reads overlapping exons using given alignments
+echo checking for BAM index... 
 for REPLICATE_GROUP in $@
 do
     IFS=':'
@@ -66,19 +66,23 @@ do
         echo
     done
 done
+echo
+echo counting reads overlapping exons using given alignments...
 tmpfile=`mktemp --tmpdir=/tmp`
 
 echo "${DIR}/../bin/get_read_counts ${GENES_FN} $tmpfile $@"
 ${DIR}/../bin/get_read_counts ${GENES_FN} $tmpfile "$@" 
+echo counted reads map to each feature.
+echo 
 
 echo %%%%%%%%%%%%%%%%%%%%%%%%%%%
 echo % 3. Differential testing %
 echo %%%%%%%%%%%%%%%%%%%%%%%%%%%
 echo
-echo testing genes for differential expression using given alignments
-
-echo "cat ${DIR}/../src/edger_difftest.R | $R_PATH --slave --args $tmpfile ${DESEQ_RES_FILE} $#"
-cat ${DIR}/../src/edger_difftest.R | $R_PATH --slave --args $tmpfile ${DESEQ_RES_FILE} $# 
+echo testing genes for differential expression using given read alignments
+#
+#echo "cat ${DIR}/../src/edger_difftest.R | $R_PATH --slave --args $tmpfile ${DESEQ_RES_FILE} $#"
+#cat ${DIR}/../src/edger_difftest.R | $R_PATH --slave --args $tmpfile ${DESEQ_RES_FILE} $# 
 
 #rm $tmpfile ${tmpfile}_COUNTS.tab ${tmpfile}_CONDITIONS.tab
 echo %%%%%%%%
