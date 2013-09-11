@@ -3,8 +3,10 @@ suppressMessages(require("edgeR"))
 
 ### get arguments 1: INFILE, 2: OUTFILE 3:SIZE
 args <- commandArgs()
-INFILE<-args[4]
-OUTFILE<-args[5]
+ANLTYP<-args[4]
+FDRMET<-args[5]
+INFILE<-args[6]
+OUTFILE<-args[7]
 
 INFILE_COUNTS=c(paste(INFILE, "_COUNTS.tab", sep=""))
 INFILE_CONDS=c(paste(INFILE, "_CONDITIONS.tab", sep=""))
@@ -34,7 +36,7 @@ tested <- list()
 
 ##Pairwise comparisons between two or more groups 
 ##(classic)
-if (analysis_method) == "pw" {
+if (ANLTYP) == "pw" {
 
 norm_factors <- calcNormFactors(as.matrix(DGE))
 disp <- estimateCommonDisp(DGE, rowsum.filter=5)
