@@ -1,7 +1,11 @@
-<tool id="edgeR-hts" name="edgeR HTS" version="3.2.4">
+<tool id="edgeR-hts" name="edgeR" version="3.2.4">
   <description> Empirical analysis of digital gene expression data in R</description>
+  <!--<requirement type="package" version="3.0.1">r3</requirement>
+  <requirement type="R-module"i version="3.2.4">edgeR</requirement>-->
   <command interpreter="bash"> 
-./../src/edger-hts.sh $anno_input_selected $edger_out $edger_out.extra_files_path/gene_map.mat 
+    ./../src/edger-hts.sh $anno_input_selected $edger_out $edger_out.extra_files_path/gene_map.mat 
+    $analysis
+    $fdr
 #for $i in $replicate_groups
 #for $j in $i.replicates
 $j.bam_alignment:#slurp
@@ -10,20 +14,18 @@ $j.bam_alignment:#slurp
 #end for
     >> $Log_File </command>
   <inputs>
-	<param format="gff3" name="anno_input_selected" type="data" label="Genome annotation in GFF3 file" help="A tab delimited format for storing sequence features and annotations"/>
-   <repeat name="replicate_groups" title="Replicate group" min="2">
-     <repeat name="replicates" title="Replicate">
+	<param format="gff3" name="anno_input_selected" type="data" label="Genome annotation in GFF file" help="A tab delimited format for storing sequence features and annotations"/>
+    <repeat name="replicate_groups" title="Replicate group" min="2">
+      <repeat name="replicates" title="Replicate">
       <param format="bam" name="bam_alignment" type="data" label="BAM alignment file" help="BAM alignment file. Can be generated from SAM files using the SAM Tools."/>
      </repeat>
-   </repeat>
+    </repeat>
 
-    <conditional name="analysis_type">
-        <param name="analysis" type="select" label="Type of Analysis">
-            <option value="pw">Pairwise comparisons (classic)</option>
-            <option value="glm" selected="true">Generalized Linear Models</option>
-            <option value="limma">Linear Models for RNA-Seq (using LIMMA)</option>
-        </param>
-    </conditional>
+    <param name="analysis" type="select" label="Type of Analysis">
+         <option value="pw">Pairwise comparisons (classic)</option>
+         <option value="glm" selected="true">Generalized Linear Models</option>
+         <option value="limma">Linear Models for RNA-Seq (using LIMMA)</option>
+    </param>
 
 	<param name="fdr" type="select" label="False Discovery Rate adjustment method">
 		<option value="BH">Benjamini and Hochberg (1995)</option>
@@ -53,7 +55,7 @@ edgeR_ is a tool for differential expression testing of RNA-Seq data.
 
 `edgeR` requires:
 
-Genome annotation file in GFF3, containing the necessary information about the transcripts that are to be quantified.
+Genome annotation file in GFF, containing the necessary information about the transcripts that are to be quantified.
 
 The BAM alignment files grouped into replicate groups, each containing several replicates. BAM files store the read alignments, The program will also work with only two groups containing only a single replicate each. However, this analysis has less statistical power and is therefore not recommended!
 
@@ -76,10 +78,7 @@ should be cited as [1]_.
 
 **About formats**
 
-
-**GFF3 format** General Feature Format is a format for describing genes
-and other features associated with DNA, RNA and protein
-sequences. GFF3 lines have nine tab-separated fields:
+**GFF format** General Feature Format is a format/Gene Transfer Format for describing genes and other features associated with DNA, RNA and protein sequences. GFF3 lines have nine tab-separated fields:
 
 1. seqid - The name of a chromosome or scaffold.
 2. source - The program that generated this feature.
@@ -93,7 +92,7 @@ sequences. GFF3 lines have nine tab-separated fields:
 
 For more information see http://www.sequenceontology.org/gff3.shtml
 
-**SAM/BAM format** The Sequence Alignment/Map (SAM) format is a
+**BAM format** The Sequence Alignment/Map (SAM) format is a
 tab-limited text format that stores large nucleotide sequence
 alignments. BAM is the binary version of a SAM file that allows for
 fast and intensive data processing. The format specification and the
