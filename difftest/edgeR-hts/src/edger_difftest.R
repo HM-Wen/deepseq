@@ -36,111 +36,87 @@ tested <- list()
 
 ##Pairwise comparisons between two or more groups 
 ##(classic)
-if (ANLTYP) == "pw" {
+if (ANLTYP== "pw") {
 
-norm_factors <- calcNormFactors(as.matrix(DGE))
-disp <- estimateCommonDisp(DGE, rowsum.filter=5)
-disp <- estimateTagwiseDisp(disp, trend="movingave")
+    norm_factors <- calcNormFactors(as.matrix(DGE))
+    disp <- estimateCommonDisp(DGE, rowsum.filter=5)
+    disp <- estimateTagwiseDisp(disp, trend="movingave")
 
-for(i in 1:length(pw_tests)) {
-    tested[[i]] <- exactTest(disp, pair=pw_tests[[i]])
-    names(tested)[i] <- paste(pw_tests[[i]][2], "-", pw_tests[[i]][1], sep="")
-}
-
-}
-#tab <- NULL
-#for(i in names(tested)) {
-#    tab_tmp <- topTags(tested[[i]], n=Inf, adjust.method="BH")[[1]]
-#    colnames(tab_tmp) <- paste(i, colnames(tab_tmp), sep=":")
-#    tab_tmp <- tab_tmp[tagnames,]
-#    if(is.null(tab)) {
-#        tab <- tab_tmp
-#    } 
-#    else tab <- cbind(tab, tab_tmp)
-#}
-#tab <- cbind(Feature=rownames(tab), tab)
-#write.table(tab, OUTFILE, quote=F, sep="\t", row.names=F)
-##
-
-if analysis_method == "glm" or "limma" {
-#
-cont <- NULL
-for(i in 1:length(pw_tests)) {
-    cont <- c(cont, paste(pw_tests[[i]][2], "-", pw_tests[[i]][1], sep=""))
-}
+    for(i in 1:length(pw_tests)) {
+        tested[[i]] <- exactTest(disp, pair=pw_tests[[i]])
+        names(tested)[i] <- paste(pw_tests[[i]][2], "-", pw_tests[[i]][1], sep="")
+    }
 }
 
 ##Generalized Linear Models 
 ##
-if analysis_method == "glm" or "limma" {
+if (ANLTYP=="glm" | ANLTYP=="limma") {
+    suppressMessages(require("splines"))
+    cont <- NULL
+    for(i in 1:length(pw_tests)) {
+        cont <- c(cont, paste(pw_tests[[i]][2], "-", pw_tests[[i]][1], sep=""))
+    }
 
-group_fact <- factor(conds)
-design <- model.matrix(~ -1 + group_fact)
-colnames(design) <- sub("conds_fact", "", colnames(design))
+    group_fact <- factor(conds)
+    design <- model.matrix(~ -1 + group_fact)
+    colnames(design) <- sub("conds_fact", "", colnames(design))
 }
+if (ANLTYP=="glm") {
 
-if analysis_method == "glm" {
-#
-disp <- estimateGLMCommonDisp(DGE, design)
-disp <- estimateGLMTrendedDisp(disp, design)
-disp <- estimateGLMTagwiseDisp(disp, design)
-fit <- glmFit(disp, design)
+    disp <- estimateGLMCommonDisp(DGE, design)
+    disp <- estimateGLMTrendedDisp(disp, design)
+    disp <- estimateGLMTagwiseDisp(disp, design)
+    fit <- glmFit(disp, design)
 
-cont <- makeContrasts(contrasts=cont, levels=design)
-for(i in colnames(cont)) {
-    tested[[i]] <- glmLRT(fit, contrast=cont[,i])
+    cont <- makeContrasts(contrasts=cont, levels=design)
+    for(i in colnames(cont)) {
+        tested[[i]] <- glmLRT(fit, contrast=cont[,i])
+    }
 }
-
-if analysis_method == "glm" or "limma" {
-
-tab <- NULL
-for(i in names(tested)) {
-    tab_tmp <- topTags(tested[[i]], n=Inf, adjust.method="BH")[[1]]
-    colnames(tab_tmp) <- paste(i, colnames(tab_tmp), sep=":")
-    tab_tmp <- tab_tmp[tagnames,]
-    if(is.null(tab)) {
-        tab <- tab_tmp
-    } 
-    else tab <- cbind(tab, tab_tmp)
-}
-tab <- cbind(Feature=rownames(tab), tab)
-write.table(tab, OUTFILE, quote=F, sep="\t", row.names=F)
-}
-##
-##
-
-#group_fact <- factor(conds)
-#design <- model.matrix(~ -1 + group_fact)
-#colnames(design) <- sub("conds_fact", "", colnames(design))
 
 ##LIMMA Liner Models for RNA-seq
 ## 
-if analysis_method == "limma" { 
+if (ANLTYP=="limma") { 
 
-norm_factors <- calcNormFactors(as.matrix(DGE))
-y <- voom(DGE, design, plot=FALSE)
+    norm_factors <- calcNormFactors(as.matrix(DGE))
+    y <- voom(DGE, design, plot=FALSE)
 
-fit <- lmFit(y, design)
-tab <- data.frame(ID=rownames(y$E), y$E, stringsAsFactors=F)
+    fit <- lmFit(y, design)
+    tab <- data.frame(ID=rownames(y$E), y$E, stringsAsFactors=F)
 
-cont <- NULL
-for(i in 1:length(pw_tests)) {
-    cont <- c(cont, paste(pw_tests[[i]][2], "-", pw_tests[[i]][1], sep=""))
-}
-cont <- makeContrasts(contrasts=cont, levels=design)
+    cont <- NULL
+    for(i in 1:length(pw_tests)) {
+        cont <- c(cont, paste(pw_tests[[i]][2], "-", pw_tests[[i]][1], sep=""))
+    }
+    cont <- makeContrasts(contrasts=cont, levels=design)
 
-fit2 <- contrasts.fit(fit, cont)
-fit2 <- eBayes(fit2)
+    fit2 <- contrasts.fit(fit, cont)
+    fit2 <- eBayes(fit2)
 
-tab <- NULL
-for(i in colnames(fit2)) {
-    tab_tmp <- topTable(fit2, coef=i, n=Inf, sort.by="none", adjust.method="BH")
-    colnames(tab_tmp)[-1] <- paste(i, colnames(tab_tmp)[-1], sep=":")
-    if(is.null(tab)) {
-        tab <- tab_tmp
-    } else tab <- cbind(tab, tab_tmp[,-1])
-}
-write.table(tab, OUTFILE, quote=F, sep="\t", row.names=F)
+    tab <- NULL
+    for(i in colnames(fit2)) {
+        tab_tmp <- topTable(fit2, coef=i, n=Inf, sort.by="none", adjust.method=FDRMET)
+        colnames(tab_tmp)[-1] <- paste(i, colnames(tab_tmp)[-1], sep=":")
+        if(is.null(tab)) {
+            tab <- tab_tmp
+        } else tab <- cbind(tab, tab_tmp[,-1])
+    }
+    write.table(tab, OUTFILE, quote=F, sep="\t", row.names=F)
 }
 ## 
-## 
+## General result file 
+if (ANLTYP=="glm" | ANLTYP=="pw") {
+    tab <- NULL
+    for(i in names(tested)) {
+        tab_tmp <- topTags(tested[[i]], n=Inf, adjust.method=FDRMET)[[1]]
+        colnames(tab_tmp) <- paste(i, colnames(tab_tmp), sep=":")
+        tab_tmp <- tab_tmp[tagnames,]
+        if(is.null(tab)) {
+            tab <- tab_tmp
+        } 
+        else tab <- cbind(tab, tab_tmp)
+    }
+    tab <- cbind(Feature=rownames(tab), tab)
+    write.table(tab, OUTFILE, quote=F, sep="\t", row.names=F)
+}
+##
