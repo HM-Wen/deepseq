@@ -80,11 +80,10 @@ echo % 3. Differential testing %
 echo %%%%%%%%%%%%%%%%%%%%%%%%%%%
 echo
 echo testing genes for differential expression using given read alignments
-#
-#echo "cat ${DIR}/../src/edger_difftest.R | $R_PATH --slave --args $tmpfile ${DESEQ_RES_FILE} $#"
-#cat ${DIR}/../src/edger_difftest.R | $R_PATH --slave --args $tmpfile ${DESEQ_RES_FILE} $# 
 
-#rm $tmpfile ${tmpfile}_COUNTS.tab ${tmpfile}_CONDITIONS.tab
+echo "cat ${DIR}/../src/edger_difftest.R | $R_PATH --slave --args $ANL_TYPE $FDR_MT $tmpfile ${RES_FILE}"
+cat ${DIR}/../src/edger_difftest.R | $R_PATH --slave --args $ANL_TYPE $FDR_MT $tmpfile ${RES_FILE}  
+
 echo %%%%%%%%
 echo % Done %
 echo %%%%%%%%
