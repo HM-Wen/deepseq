@@ -28,7 +28,9 @@ $j.bam_alignment:#slurp
     </param>
 
 	<param name="fdr" type="select" label="False Discovery Rate adjustment method">
-		<option value="BH">Benjamini and Hochberg (1995)</option>
+        <option value="fdr" selected="true">fdr</option>
+		<option value="BH">Benjamini and Hochberg</option>
+        <option value="bonferroni">Bonferroni</option>
 		<option value="none">None</option>
 	</param>
   </inputs>
