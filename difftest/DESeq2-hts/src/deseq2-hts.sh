@@ -41,6 +41,9 @@ echo
 echo genome annotation stored in $GENES_FN
 echo 
 
+FITTYP=${1}
+shift
+
 echo %%%%%%%%%%%%%%%%%%%%
 echo % 2. Read counting %
 echo %%%%%%%%%%%%%%%%%%%%
@@ -69,7 +72,6 @@ echo "${DIR}/../bin/get_read_counts ${GENES_FN} $tmpfile $@"
 ${DIR}/../bin/get_read_counts ${GENES_FN} $tmpfile "$@" 
 echo counted reads map to each feature.
 echo
-exit 
 
 echo %%%%%%%%%%%%%%%%%%%%%%%%%%%
 echo % 3. Differential testing %
@@ -78,7 +80,7 @@ echo
 echo testing genes for differential expression using given read alignments
 
 echo "cat ${DIR}/../src/difftest_deseq2.R | $R_PATH --slave --args $tmpfile ${DESEQ_RES_FILE} $#"
-cat ${DIR}/../src/difftest_deseq2.R | $R_PATH --slave --args $tmpfile ${DESEQ_RES_FILE} $# 
+cat ${DIR}/../src/difftest_deseq2.R | $R_PATH --slave --args ${FITTYP} $tmpfile ${DESEQ_RES_FILE} 
 
 echo %%%%%%%%
 echo % Done %

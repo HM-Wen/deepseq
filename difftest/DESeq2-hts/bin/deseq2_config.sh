@@ -10,8 +10,9 @@ export MATLAB_INCLUDE_DIR=
 export OCTAVE_BIN_PATH=
 export OCTAVE_MKOCT=
 export SAMTOOLS_DIR=
-export PYTHON_PATH=
+export PYTHON_PATH=/usr/bin/python
 export SCIPY_PATH=
 export R_PATH=
 export LD_LIBRARY_PATH=
 export ENVIRONMENT=galaxy
+

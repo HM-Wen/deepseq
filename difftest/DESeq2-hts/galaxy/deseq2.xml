@@ -2,6 +2,7 @@
   <description> Differential gene expression analysis based on the negative binomial distribution</description>
   <command interpreter="bash"> 
 ./../src/deseq2-hts.sh $anno_input_selected $deseq_out $deseq_out.extra_files_path/gene_map.mat 
+$distype
 #for $i in $replicate_groups
 #for $j in $i.replicates
 $j.bam_alignment:#slurp
@@ -16,6 +17,13 @@ $j.bam_alignment:#slurp
       <param format="bam" name="bam_alignment" type="data" label="BAM alignment file" help="BAM alignment file. Can be generated from SAM files using the SAMTools."/>
      </repeat>
    </repeat>
+
+    <param name="distype" type="select" label="Select fitting of dispersions to the mean intensity">
+            <option value="parametric">Parametric</option>
+            <option value="local">Local</option>
+            <option value="mean" selected="true">Mean</option>
+    </param>
+
   </inputs>
 
   <outputs>
@@ -25,7 +33,6 @@ $j.bam_alignment:#slurp
 
   <tests>
     <test> 
-	command:
 	./deseq2-hts.sh ../test_data/deseq_c_elegans_WS200-I-regions.gff3 ../test_data/deseq_c_elegans_WS200-I-regions_deseq.txt ../test_data/genes.mat ../test_data/deseq_c_elegans_WS200-I-regions-SRX001872.bam ../test_data/deseq_c_elegans_WS200-I-regions-SRX001875.bam
 	
       <param name="anno_input_selected" value="deseq_c_elegans_WS200-I-regions.gff3" ftype="gff3" />
