@@ -7,13 +7,12 @@
     $library_type
     $minQUAL
     $dexseq_out $dexseq_out.extra_files_path
+#for $i in $replicate_groups
+#for $j in $i.replicates
+$j.bam_alignment:#slurp
+#end for
 
-    #for $i in $replicate_groups
-    #for $j in $i.replicates
-    $j.bam_alignment:#slurp
-    #end for
-
-    #end for
+#end for
     >> $Log_File </command>
     <inputs>
     
