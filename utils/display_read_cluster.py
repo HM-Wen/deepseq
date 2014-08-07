@@ -35,7 +35,11 @@ def alignment_parse(bam_file, region_sltd):
 
     sam_reader.close()
 
-def plot_cluster(cluster_name, read_ids, location_db, freq_db):
+
+def plot_cluster(cluster_filename, read_ids, location_db, freq_db):
+    """
+    Plotting each read as a horizontal bar graph in the cluster
+    """
 
     read_info = []
     for read_id in read_ids:
@@ -43,12 +47,15 @@ def plot_cluster(cluster_name, read_ids, location_db, freq_db):
         freq = freq_db[read_id]
         read_info.append((start, end, freq))
     read_info.sort(reverse=True)
+
     min_freq = min(l[2] for l in read_info)
     max_freq = max(l[2] for l in read_info)
     print 'Minimum frequency: ' + str(min_freq)
     print 'Maximum frequency: ' + str(max_freq)
+
     freq_cmap = pylab.get_cmap('Blues')
     pylab.clf()
+
     labels_done = []
     for rindex, (start, end, freq) in enumerate(read_info):
         if min_freq == max_freq:
@@ -65,13 +72,15 @@ def plot_cluster(cluster_name, read_ids, location_db, freq_db):
         else:
             label = None
         pylab.barh(rindex, end - start, left=start, height=0.8, color=color, label=label)
-    pylab.title(cluster_name)
-    pylab.xlabel("Coordinates")
-    pylab.ylabel("Reads")
-    pylab.legend(loc='upper right')
+
+    pylab.title(cluster_filename)
+    pylab.xlabel("genome position")
+    pylab.ylabel("sequence reads")
+    #pylab.legend(loc='upper right')
     pylab.yticks(())
-    out_file = "%s.png" % (cluster_name)
+    out_file = "%s.png" % (cluster_filename)
     pylab.savefig(out_file)
+
 
 if __name__ == '__main__':
     
@@ -86,42 +95,34 @@ if __name__ == '__main__':
     # - Distance in basepairs for two reads to be in the same cluster;
     #   for instance 20 would group all reads with 20bp of each other
     # - Number of reads necessary for a group to be considered a cluster;
-    #   2 returns all groups with 2 or more overlapping reads
-    cluster_trees = collections.defaultdict(lambda:ClusterTree(cluster_distance, 2))
+    #   100 returns all groups with 100 or more overlapping reads
+    cluster_trees = collections.defaultdict(lambda:ClusterTree(cluster_distance, 100))
 
     read_id_map, cnt, location_db, freq_db = dict(), 0, dict(), dict()
     align_generator = alignment_parse(alignment_file, cluster_name)
 
     for read_id, match_id, start, end in align_generator:
-        #print read_id, match_id, start, end 
+
         if not read_id in read_id_map: #make read id compact 
             cnt +=1 
             read_id_map[read_id] = cnt
 
         cluster_trees[match_id].insert(start, end, read_id_map[read_id])
-        break 
 
-    sys.exit(-1)
+        location_db[read_id_map[read_id]] = start, end #reads location 
 
-    # Parse alignment file 
-    for read_id, match_id, start, end in align_generator:
-        if not read_id in read_id_map: # get rid of long read id with small numbers 
-            cnt +=1 
-            read_id_map[read_id] = cnt
-        cluster_trees[match_id].insert(start, end, read_id_map[read_id])
-        location_db[read_id_map[read_id]] = start, end  # location of reads in genome 
-        if read_id_map[read_id] in freq_db: # occurence of each read 
+        if read_id_map[read_id] in freq_db: #multiple alignments 
             freq_db[read_id_map[read_id]] += 1
         else:
             freq_db[read_id_map[read_id]] = 1
-    print 
-    print 'Number of clusters: ' + str(len(cluster_trees))
 
+    #print 'different clusters: %d ' % len(cluster_trees)
+
+    # - Plot different clusters of reads mapped to the genome 
     for chrom, cluster_tree in cluster_trees.items():
         for start, end, read_ids in cluster_tree.getregions():
-            if len(read_ids) < 100:continue # just remove the cluster having less number of reads.
-            print 
-            print 'number of reads ' + str(len(read_ids))
-            plot_cluster(cluster_name, read_ids, location_db, freq_db)
-            break # only one at this time 
-    print 
+            print '     number of reads: %d ' % len(read_ids)
+            fname = "%s_%d" % (cluster_name, len(read_ids))
+
+            plot_cluster(fname, read_ids, location_db, freq_db)
+
