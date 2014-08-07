@@ -14,16 +14,26 @@ import os
 import re 
 import sys
 import pylab 
+import pysam 
 import collections
 from bx.intervals.cluster import ClusterTree
 
-def alignment_parse(alignment_file, cluster_name):
+
+def alignment_parse(bam_file, region_sltd):
+    """
+    Extract contents from BAM file
+    """
     
-    infh = os.popen('/fml/ag-raetsch/share/software/samtools/samtools view ' + alignment_file + ' ' + cluster_name)
-    for line in infh:
-        line = line.strip().split('\t')
-        yield line[0], line[2], int(line[3]), int(line[3])+41
-    infh.close()
+    if not os.path.exists(bam_file + ".bai"):
+        pysam.index(bam_file)
+    sam_reader = pysam.Samfile(bam_file, "rb")
+
+    chr_name, start_s, stop_s = re.search(r'^(.+):(\d+)-(\d+)$', region_sltd).group(1,2,3)
+
+    for rec in sam_reader.fetch(chr_name, int(start_s), int(stop_s)):
+        yield rec.qname, sam_reader.getrname(rec.rname), rec.pos, rec.pos+rec.qlen
+
+    sam_reader.close()
 
 def plot_cluster(cluster_name, read_ids, location_db, freq_db):
 
@@ -73,12 +83,27 @@ if __name__ == '__main__':
         print __doc__
         sys.exit(-1)
 
-    sys.exit(-1)
-    cluster_distance = 10  # change according to the location you wish to look
+    # - Distance in basepairs for two reads to be in the same cluster;
+    #   for instance 20 would group all reads with 20bp of each other
+    # - Number of reads necessary for a group to be considered a cluster;
+    #   2 returns all groups with 2 or more overlapping reads
     cluster_trees = collections.defaultdict(lambda:ClusterTree(cluster_distance, 2))
-    # Parse alignment file 
+
     read_id_map, cnt, location_db, freq_db = dict(), 0, dict(), dict()
     align_generator = alignment_parse(alignment_file, cluster_name)
+
+    for read_id, match_id, start, end in align_generator:
+        #print read_id, match_id, start, end 
+        if not read_id in read_id_map: #make read id compact 
+            cnt +=1 
+            read_id_map[read_id] = cnt
+
+        cluster_trees[match_id].insert(start, end, read_id_map[read_id])
+        break 
+
+    sys.exit(-1)
+
+    # Parse alignment file 
     for read_id, match_id, start, end in align_generator:
         if not read_id in read_id_map: # get rid of long read id with small numbers 
             cnt +=1 
