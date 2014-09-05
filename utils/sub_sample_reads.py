@@ -83,7 +83,13 @@ def __main__():
         total_cnt += 1
 
         if rnb <= accept_prob:
-            left_reads[rec.id] = 0
+            ## @UNC15-SN850_63:4:1101:1103:2151/1 @UNC15-SN850_63:4:1101:1103:2151/2
+            read_id = rec.id.split('/')
+            if len(read_id) > 1:
+                left_reads[read_id[0]] = 0
+            else:    
+                ## @UNC11-SN627:294:C236MACXX:5:1101:1430:2218 1:N:0:GGNTAC  @UNC11-SN627:294:C236MACXX:5:1101:1430:2218 2:N:0:GGNTAC 
+                left_reads[rec.id] = 0
 
             sample_cnt += 1 
             subFile_1.write(rec.format("fastq"))
@@ -96,8 +102,16 @@ def __main__():
 
     fqh = helper.open_file('%s/%s' % (fastq_path, fastq_2_file)) 
     for rec in SeqIO.parse(fqh, 'fastq'):
-        if rec.id in left_reads:
-            subFile_2.write(rec.format("fastq"))
+        read_id = rec.id.split('/')
+
+        if len(read_id) > 1:
+            ## @UNC15-SN850_63:4:1101:1103:2151/1
+            if read_id[0] in left_reads:
+                subFile_2.write(rec.format("fastq"))
+        else:
+            ## @UNC11-SN627:294:C236MACXX:5:1101:1430:2218 1:N:0:GGNTAC
+            if rec.id in left_reads:
+                subFile_2.write(rec.format("fastq"))
     fqh.close() 
     subFile_2.close() 
 
