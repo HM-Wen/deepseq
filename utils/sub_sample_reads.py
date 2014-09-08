@@ -27,6 +27,9 @@ def __main__():
     
     fastq_1_file = None 
     fastq_2_file = None
+
+    # TODO expecting the left and right reads in the base folder with .fastq ending. Make it is common general form
+
     ## get the files from base path 
     for filename in os.listdir(fastq_path):
         if re.search(r'_1.fastq', filename):
@@ -62,9 +65,8 @@ def __main__():
 
     print accept_prob
 
-    sub_fastq_1_file = "sample_%s.bz2" % fastq_1_file 
-    sub_fastq_2_file = "sample_%s.bz2" % fastq_2_file 
-
+    sub_fastq_1_file = "%d_percentage_%s.bz2" % (percentage, fastq_1_file)
+    sub_fastq_2_file = "%d_percentage_%s.bz2" % (percentage, fastq_2_file)
 
     ## writing out sub sample files
     try:
