@@ -78,7 +78,7 @@ do
 
         echo 
     done
-    echo conuted condition ${COND} 
+    echo counted condition ${COND} 
 done
 echo counted reads map to each exon.
 echo 
